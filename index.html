@@ -1,0 +1,2105 @@
+<html lang="de"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+#todesScreen {
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    color:white;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    font-size:40px;
+    z-index:9999;
+}
+
+#todesScreen > button {
+    font-size:25px;
+    padding:10px 30px;
+}
+
+#top10Screen {
+    position:fixed;
+    inset:0;
+    z-index:10000;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    padding:16px;
+    box-sizing:border-box;
+    background:rgba(0,0,0,0.82);
+    color:white;
+    font-family:sans-serif;
+}
+
+#top10Box {
+    width:min(480px, 100%);
+    padding:22px;
+    border-radius:14px;
+    background:#101b3e;
+    box-sizing:border-box;
+}
+
+#top10Liste {
+    margin:14px 0 20px;
+    padding-left:26px;
+    line-height:1.7;
+}
+
+#top10Status {
+    color:#b9d4ff;
+    min-height:1.4em;
+}
+
+#shopBereich {
+    background:rgba(255,255,255,0.08);
+    border-radius:14px;
+    padding:16px 20px;
+    max-width:600px;
+}
+
+#shopMuenzenAnzeige {
+    font-size:22px;
+    margin:0 0 12px 0;
+}
+
+#shopArtikel {
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    justify-content:center;
+}
+
+.shopKarte {
+    background:rgba(255,255,255,0.1);
+    border-radius:10px;
+    padding:10px;
+    width:120px;
+    text-align:center;
+    font-size:15px;
+}
+
+.shopKarte img {
+    width:60px;
+    height:60px;
+    display:block;
+    margin:0 auto 8px auto;
+}
+
+.shopKarte button {
+    margin-top:8px;
+    font-size:14px;
+    padding:6px 10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.shopKaufBtn {
+    background:#2e9e4f;
+    color:white;
+}
+
+.shopKaufBtn:disabled {
+    background:#666;
+    cursor:not-allowed;
+}
+
+.shopAusruestenBtn {
+    background:#2c6fd8;
+    color:white;
+}
+
+.shopAusgeruestetBtn {
+    background:#555;
+    color:#ccc;
+    cursor:default;
+}
+
+body {
+    margin:0;
+    background:#05081a;
+    -webkit-tap-highlight-color:transparent;
+    overscroll-behavior:none;
+}
+
+#spielLayout {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:flex-start;
+    gap:16px;
+    padding:14px;
+    box-sizing:border-box;
+    width:100%;
+    min-height:100vh;
+}
+
+#feldWrapper {
+    position:relative;
+    overflow:hidden;
+    flex-shrink:0;
+    line-height:0;
+}
+
+.emoji {
+    width:1em;
+    height:1em;
+}
+
+.boss {
+    position:absolute;
+    width:70px;
+    height:70px;
+    background:purple;
+    border-radius:50%;
+    box-shadow:0 0 20px purple;
+    z-index:50;
+}
+
+#ui {
+    position:relative;
+    color:white;
+    font-family:sans-serif;
+    flex-shrink:0;
+    max-width:260px;
+}
+
+#skinAuswahl {
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+#skinAuswahl img {
+    width:40px;
+    height:40px;
+    cursor:pointer;
+    border:2px solid transparent;
+    border-radius:6px;
+    padding:2px;
+    background:#eee;
+}
+
+#skinAuswahl img.aktiv {
+    border-color:#00aaff;
+    background:#cdeeff;
+}
+
+#skinAuswahl img.gesperrt {
+    cursor:not-allowed;
+    filter:grayscale(1);
+    opacity:0.45;
+}
+
+#schwierigkeitsAuswahl {
+    display:flex;
+    gap:6px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+}
+
+.schwBtn {
+    padding:6px 10px;
+    border:2px solid transparent;
+    border-radius:6px;
+    background:#333;
+    color:white;
+    font-size:14px;
+    cursor:pointer;
+}
+
+.schwBtn.aktiv {
+    border-color:#00aaff;
+    background:#0a3a5c;
+}
+
+.schwBtn:disabled {
+    opacity:0.4;
+    cursor:not-allowed;
+}
+
+#jetBox {
+    position:relative;
+    width:800px;
+    height:600px;
+    border:3px solid black;
+    overflow:hidden;
+    transform-origin: top left;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.9) 1px, transparent 1px),
+        radial-gradient(circle at 60% 70%, rgba(255,255,255,0.7) 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.8) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 40% 85%, rgba(255,255,255,0.6) 1px, transparent 1px),
+        radial-gradient(circle at 10% 60%, rgba(255,255,255,0.9) 1px, transparent 1px),
+        radial-gradient(circle at 90% 50%, rgba(255,255,255,0.7) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 30% 10%, rgba(255,255,255,0.8) 1px, transparent 1px),
+        radial-gradient(circle at 70% 90%, rgba(255,255,255,0.6) 1px, transparent 1px),
+        linear-gradient(135deg, #050818 0%, #0a1030 40%, #1a0a30 70%, #05081a 100%);
+    background-size: 200px 200px, 250px 250px, 300px 300px, 220px 220px,
+                      180px 180px, 260px 260px, 190px 190px, 240px 240px,
+                      100% 100%;
+    background-repeat: repeat;
+}
+
+#jet {
+    position:absolute;
+    width:60px;
+    z-index:5;
+}
+
+.jet-feuer {
+    position:absolute;
+    width:28px;
+    height:18px;
+    border-radius:50%;
+    background:linear-gradient(90deg, transparent, #e53935 28%, #ff9800 56%, #fff59d 78%, white);
+    clip-path:polygon(0 50%, 38% 8%, 100% 28%, 100% 72%, 38% 92%);
+    filter:drop-shadow(0 0 6px #ff6f00);
+    pointer-events:none;
+    z-index:4;
+    animation:jetFeuer 420ms ease-out forwards;
+}
+
+@keyframes jetFeuer {
+    from { opacity:0.95; transform:translateX(0) scale(0.7); }
+    to { opacity:0; transform:translateX(-30px) scaleX(1.6) scaleY(0.35); }
+}
+
+.bullet {
+    position:absolute;
+    width:15px;
+    height:15px;
+    background:red;
+    border-radius:50%;
+    z-index:999;
+}
+
+.kiste {
+    position:absolute;
+    width:30px;
+    height:30px;
+    z-index:20;
+}
+
+.komet {
+    position:absolute;
+    width:35px;
+    height:35px;
+    background:orange;
+    border-radius:50%;
+    box-shadow:0 0 15px red;
+    z-index:15;
+}
+
+.hintergrundschiff {
+    position:absolute;
+    width:36px;
+    height:14px;
+    background:linear-gradient(90deg, #dfe6ff, #8fa0d8 55%, rgba(143,160,216,0));
+    clip-path: polygon(0% 50%, 78% 0%, 100% 50%, 78% 100%);
+    filter: drop-shadow(0 0 4px rgba(150,180,255,0.7));
+    pointer-events:none;
+    z-index:2;
+}
+
+.hintergrundschiff::after {
+    content:"";
+    position:absolute;
+    left:-14px;
+    top:5px;
+    width:14px;
+    height:4px;
+    background:linear-gradient(90deg, transparent, rgba(180,210,255,0.6));
+    border-radius:2px;
+}
+
+.endboss {
+    position:absolute;
+    width:60px;
+    transform:scaleX(-1);
+    z-index:45;
+    filter:drop-shadow(0 0 12px red);
+}
+
+.ziel {
+    position:absolute;
+    width:26px;
+    height:26px;
+    background:dodgerblue;
+    border-radius:50%;
+    box-shadow:0 0 12px dodgerblue;
+    z-index:40;
+}
+
+.planet {
+    position:absolute;
+    border-radius:50%;
+    z-index:1;
+    pointer-events:none;
+}
+
+.planet-ring {
+    position:absolute;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.4);
+    z-index:1;
+    pointer-events:none;
+}
+
+/* Der dekorative Ring oben rechts ist ausgeblendet. */
+#jetBox .planet-ring {
+    display:none;
+}
+
+.powerup {
+    position:absolute;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    z-index:25;
+    pointer-events:none;
+}
+
+.powerup-feuerrate {
+    background:radial-gradient(circle, #fff59d, #f9a825 75%);
+    box-shadow:0 0 12px #f9a825;
+}
+
+.powerup-schaden {
+    background:radial-gradient(circle, #ffab91, #d84315 75%);
+    box-shadow:0 0 12px #d84315;
+}
+
+/* ===== Touch-Steuerung für Handy/Tablet ===== */
+
+#touchSteuerung {
+    display:none;
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:500;
+    justify-content:space-between;
+    align-items:flex-end;
+    padding:16px;
+    box-sizing:border-box;
+    pointer-events:none;
+}
+
+#steuerkreuz {
+    display:grid;
+    grid-template-columns:56px 56px 56px;
+    grid-template-rows:56px 56px 56px;
+    gap:4px;
+    pointer-events:auto;
+}
+
+.steuerBtn {
+    width:56px;
+    height:56px;
+    border-radius:12px;
+    border:none;
+    background:rgba(255,255,255,0.25);
+    color:white;
+    font-size:22px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    touch-action:none;
+    user-select:none;
+}
+
+.steuerBtn:active {
+    background:rgba(255,255,255,0.5);
+}
+
+#btnHoch { grid-column:2; grid-row:1; }
+#btnLinks { grid-column:1; grid-row:2; }
+#btnRechts { grid-column:3; grid-row:2; }
+#btnRunter { grid-column:2; grid-row:3; }
+
+#btnSchiessen {
+    width:84px;
+    height:84px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,60,60,0.55);
+    color:white;
+    font-size:30px;
+    pointer-events:auto;
+    touch-action:none;
+    user-select:none;
+}
+
+#btnSchiessen:active {
+    background:rgba(255,60,60,0.85);
+}
+
+/* Nur auf echten Touch-Geräten (Handy/Tablet) einblenden */
+@media (hover:none) and (pointer:coarse) {
+    #touchSteuerung {
+        display:flex;
+    }
+}
+
+/* Auf dem Handy bleibt die Spielansicht groß; die Informationen darüber sind kompakt. */
+@media (max-width:900px) {
+    #spielLayout {
+        padding:8px;
+        gap:8px;
+        padding-bottom:120px;
+    }
+
+    #ui {
+        width:100%;
+        max-width:none;
+        font-size:14px;
+    }
+
+    #ui br {
+        display:none;
+    }
+
+    #ui p {
+        display:inline-block;
+        margin:5px 10px 5px 0;
+    }
+
+    #skinAuswahl {
+        margin-top:5px;
+    }
+}
+
+</style>
+
+</head><body>
+
+<div id="spielLayout">
+    <div id="ui">
+        <div id="schwierigkeitsAuswahl">
+            <span>Modus:</span>
+            <button id="schwBtn-leicht" class="schwBtn" onclick="setSchwierigkeit('leicht')">Leicht</button>
+            <button id="schwBtn-mittel" class="schwBtn aktiv" onclick="setSchwierigkeit('mittel')">Mittel</button>
+            <button id="schwBtn-schwer" class="schwBtn" onclick="setSchwierigkeit('schwer')">Schwer</button>
+        </div>
+        <br>
+        <button onclick="startSpiel()">START</button>
+        <button onclick="top10Oeffnen()">TOP 10</button>
+        <br><br>
+        <span id="AusK">65 <img src="kristall.png" class="emoji"></span>
+        <span id="AusM">0 <img src="muenze.png" class="emoji"></span>
+        <p id="AusPunkte">Punkte: 0</p>
+        <p id="AusLevel">Level: 1 (0 / 10)</p>
+        <p id="AusRekord">Rekord: 0</p>
+        <p id="Aus1">100 gesundheit</p>
+        <p id="AusLeben">❤️ Leben: 1</p>
+        <p id="AusBossTimer">Endboss in: 3:00</p>
+        <p id="AusBoni"></p>
+        <button onclick="heilen()">
+            <span id="Aus2">10 🥙</span>
+        </button>
+        <button onclick="makduen()">
+            <span id="Aus4">0 <img src="dinosaurier.png" class="emoji"></span>
+        </button>
+
+        <div id="skinAuswahl">
+            <span>Skin:</span>
+            <img id="skinBtn-standard" src="duesenjet.png" class="skinBtn" onclick="setSkin('standard')" title="Standard">
+            <img id="skinBtn-red" src="duesenjet_rot.png" class="skinBtn" onclick="setSkin('red')" title="Rot">
+            <img id="skinBtn-gelb" src="duesenjet_gelb.png" class="skinBtn aktiv" onclick="setSkin('gelb')" title="Gelb">
+        </div>
+    </div>
+
+    <div id="feldWrapper" style="width: 738px; height: 553.5px;">
+        <div id="jetBox" style="transform: scale(0.9225);">
+            <img id="jet" src="duesenjet_gelb.png" style="left: 150px; top: 120px;">
+        <div class="planet" style="width: 170px; height: 170px; left: 610px; top: -50px; background: radial-gradient(circle at 35% 30%, rgb(111, 143, 216), rgb(44, 63, 122) 55%, rgb(20, 27, 61) 85%); box-shadow: rgba(0, 0, 0, 0.55) -20px -20px 40px inset, rgba(100, 130, 220, 0.2) 0px 0px 60px; opacity: 0.6;"></div><div class="planet-ring" style="width: 272px; height: 54.4px; left: 559px; top: 21.4px; transform: rotate(-15deg); border-color: rgba(255, 255, 255, 0.2);"></div><div class="hintergrundschiff" style="top: 629.671px; left: 345.359px; opacity: 0.52; transform: scale(0.977133) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 174.735px; left: 524.611px; opacity: 0.34; transform: scale(1.16934);"></div><div class="hintergrundschiff" style="top: 466.214px; left: 56.6805px; opacity: 0.62; transform: scale(1.16844);"></div><div class="hintergrundschiff" style="top: 100.023px; left: 478.824px; opacity: 0.53; transform: scale(1.04328) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 160.605px; left: 82.9747px; opacity: 0.58; transform: scale(1.02052);"></div><div class="planet" style="width: 170px; height: 170px; left: 610px; top: -50px; background: radial-gradient(circle at 30% 75%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 18%), radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 16%), radial-gradient(circle at 55% 60%, rgb(74, 122, 44) 0%, rgb(74, 122, 44) 12%, rgba(74, 122, 44, 0) 14%), radial-gradient(circle at 25% 35%, rgb(107, 143, 60) 0%, rgb(107, 143, 60) 14%, rgba(107, 143, 60, 0) 16%), radial-gradient(circle at 68% 68%, rgb(138, 106, 58) 0%, rgb(138, 106, 58) 10%, rgba(138, 106, 58, 0) 12%), radial-gradient(circle at 35% 30%, rgb(79, 168, 224), rgb(30, 95, 168) 55%, rgb(12, 44, 77) 85%); box-shadow: rgba(0, 0, 0, 0.55) -20px -20px 40px inset, rgba(80, 160, 220, 0.25) 0px 0px 60px; opacity: 0.85;"></div><div class="planet-ring" style="width: 272px; height: 54.4px; left: 559px; top: 21.4px; transform: rotate(-15deg); border-color: rgba(255, 255, 255, 0.2);"></div><div class="hintergrundschiff" style="top: 447.303px; left: 213.794px; opacity: 0.42; transform: scale(0.72099);"></div><div class="hintergrundschiff" style="top: 99.6046px; left: 600.418px; opacity: 0.45; transform: scale(0.687202) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 118.702px; left: 831.866px; opacity: 0.38; transform: scale(0.701806) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 455.191px; left: 130.736px; opacity: 0.32; transform: scale(1.15798) scaleX(-1);"></div><div class="hintergrundschiff" style="top: -22.5524px; left: 679.502px; opacity: 0.42; transform: scale(0.959789);"></div><div class="hintergrundschiff" style="top: 308.209px; left: 697.179px; opacity: 0.65; transform: scale(1.14506) scaleX(-1);"></div><img class="planet" src="./jet-spiel_5_files/Erde.png" style="width: 170px; height: 170px; left: 610px; top: -50px; border-radius: 0px; image-rendering: pixelated;"><div class="hintergrundschiff" style="top: 601.957px; left: 760.737px; opacity: 0.5; transform: scale(1.16091);"></div><div class="hintergrundschiff" style="top: 436.048px; left: 476.9px; opacity: 0.65; transform: scale(1.26733);"></div><div class="hintergrundschiff" style="top: 428.426px; left: 271.319px; opacity: 0.35; transform: scale(0.750537) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 556.544px; left: 21.4235px; opacity: 0.47; transform: scale(1.30151);"></div><div class="hintergrundschiff" style="top: 401.286px; left: 205.743px; opacity: 0.62; transform: scale(1.03129);"></div><div class="hintergrundschiff" style="top: 108.595px; left: -10.7769px; opacity: 0.37; transform: scale(0.890056);"></div><img class="planet" src="./jet-spiel_5_files/Erde(1).png" style="width: 170px; height: 170px; left: 610px; top: -50px; border-radius: 0px; image-rendering: pixelated;"><div class="hintergrundschiff" style="top: 272.951px; left: 53.3422px; opacity: 0.49; transform: scale(0.804216) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 320.275px; left: 532.939px; opacity: 0.5; transform: scale(1.05805) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 423.2px; left: 33.1804px; opacity: 0.45; transform: scale(0.827832);"></div><img class="planet" src="Erde.png" style="width: 170px; height: 170px; left: 610px; top: -50px; border-radius: 0px; image-rendering: pixelated;"><div class="hintergrundschiff" style="top: 163.537px; left: 446.539px; opacity: 0.42; transform: scale(1.32125) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 251.297px; left: 604.727px; opacity: 0.64; transform: scale(1.02074) scaleX(-1);"></div><div class="hintergrundschiff" style="top: 246.989px; left: 102.581px; opacity: 0.55; transform: scale(0.653615);"></div><div class="hintergrundschiff" style="top: 341.318px; left: 1.68255px; opacity: 0.58; transform: scale(0.604854);"></div></div>
+    </div>
+</div>
+
+<div id="top10Screen" aria-hidden="true">
+    <div id="top10Box">
+        <h2>Weltweite Top 10</h2>
+        <p id="top10Status">Lade Bestenliste ...</p>
+        <ol id="top10Liste"></ol>
+        <button onclick="top10Schliessen()">Schließen</button>
+    </div>
+</div>
+
+<div id="todesScreen" style="display: none;">
+    💀 GAME OVER 💀
+    <br>
+    <span style="font-size:25px;">
+    Dein Jet wurde zerstört!
+    </span>
+    <p id="AusGameOverPunkte" style="font-size:25px;">Rundenpunkte: 0<br>Level: 1<br>Rekord: 0</p>
+    <br><br>
+    <div id="shopBereich">
+        <p id="shopMuenzenAnzeige">0 <img src="./jet-spiel_5_files/muenze(1).png" class="emoji"></p>
+        <div id="shopArtikel"></div>
+    </div>
+    <br>
+    <button onclick="neustart()">Neustart</button>
+</div>
+
+<!-- Touch-Steuerung, erscheint automatisch nur auf Handy/Tablet -->
+<div id="touchSteuerung">
+    <div id="steuerkreuz">
+        <button id="btnHoch" class="steuerBtn">▲</button>
+        <button id="btnLinks" class="steuerBtn">◀</button>
+        <button id="btnRechts" class="steuerBtn">▶</button>
+        <button id="btnRunter" class="steuerBtn">▼</button>
+    </div>
+    <button id="btnSchiessen">🔥</button>
+</div>
+
+<script>
+let kristalle = 0;
+let münzen = 0;
+let gesundheit = 100;
+let döner = 10;
+let Dino = 0;
+let leben = 1;
+let rundenPunkte = 0;
+let rekordPunkte = 0;
+let level = 1;
+let spielerName = "";
+let top10Gespeichert = false;
+let spielLaeuft = false;
+let spielGefroren = false;
+let kisten=[];
+let kometenZaehler = 0;
+let kometInterval = null;
+let kistenInterval = null;
+let bossLaeuft = false;
+let bossTreffer = 0;
+let bossKollisionsTreffer = 0;
+let bossCooldown = 0;
+let bossLeben = 0;
+
+// ===== Schaden & Feuerrate (Basis-Werte, von Power-Ups temporär erhöhbar) =====
+let schaden = 1;
+let feuerRate = 300; // Millisekunden zwischen zwei Schüssen
+let letzterSchuss = 0;
+let feuerRateBonusBisZeit = 0; // Date.now()-Zeitpunkt, bis zu dem der Feuerrate-Bonus aktiv ist
+let schadenBonusBisZeit = 0;   // Date.now()-Zeitpunkt, bis zu dem der Schaden-Bonus aktiv ist
+
+// ===== Leben der Endboss-Ziele =====
+let zielLebenMax = { ziel1: 3, ziel2: 3 };
+let zielLeben = { ziel1: 3, ziel2: 3 };
+
+// ===== Power-Ups =====
+let powerups = [];
+let powerupInterval = null;
+
+// ===== Schwierigkeitsgrade =====
+let schwierigkeit = "mittel";
+
+let schwierigkeitsEinstellungen = {
+    leicht: {
+        kometIntervall: 2800,
+        kometSpeedFaktor: 0.7,
+        bossSchwelle: 130,
+        bossTrefferNoetig: 15,
+        bossKollisionsLimit: 4,
+        endbossZeit: 240,
+        endbossKometIntervall: 2200,
+        endbossKometSpeed: 2.8
+    },
+    mittel: {
+        kometIntervall: 2000,
+        kometSpeedFaktor: 1,
+        bossSchwelle: 100,
+        bossTrefferNoetig: 20,
+        bossKollisionsLimit: 3,
+        endbossZeit: 180,
+        endbossKometIntervall: 1500,
+        endbossKometSpeed: 3.5
+    },
+    schwer: {
+        kometIntervall: 1300,
+        kometSpeedFaktor: 1.35,
+        bossSchwelle: 70,
+        bossTrefferNoetig: 25,
+        bossKollisionsLimit: 2,
+        endbossZeit: 120,
+        endbossKometIntervall: 1000,
+        endbossKometSpeed: 4.3
+    }
+};
+
+// Zweiter Boss (Endboss) - erscheint nach 3 Minuten Spielzeit
+let spielZeit = 0;
+let spielZeitLetzterTick = null;
+let spielZeitInterval = null;
+let endbossSpawned = false;
+let endbossAktiv = false;
+let endboss = null;
+let endbossKometInterval = null;
+let ziel1Zerstoert = false;
+let ziel2Zerstoert = false;
+
+// Verfügbare Jet-Skins. Neue Skins können hier einfach ergänzt werden.
+let jetSkins = {
+    standard: "duesenjet.png",
+    red: "duesenjet_rot.png",
+    gelb: "duesenjet_gelb.png"
+};
+let aktuellerSkin = "standard";
+
+// Preise für Skins im Shop (in Münzen). Standard ist von Anfang an freigeschaltet.
+let skinPreise = {
+    red: 15,
+    gelb: 25
+};
+let gekaufteSkins = {
+    standard: true,
+    red: false,
+    gelb: false
+};
+
+function setSchwierigkeit(stufe){
+    if(spielLaeuft) return; // während einer laufenden Runde nicht wechselbar
+    if(!schwierigkeitsEinstellungen[stufe]) return;
+
+    schwierigkeit = stufe;
+
+    document.querySelectorAll(".schwBtn").forEach(btn => btn.classList.remove("aktiv"));
+    let aktivBtn = document.getElementById("schwBtn-" + stufe);
+    if(aktivBtn) aktivBtn.classList.add("aktiv");
+
+    aktualisiereBossTimerAnzeige(schwierigkeitsEinstellungen[stufe].endbossZeit);
+}
+
+function aktualisiereSchwierigkeitsButtons(){
+    document.querySelectorAll(".schwBtn").forEach(btn => btn.disabled = spielLaeuft);
+}
+
+function aktualisiereSkinButtons(){
+    for(let name in jetSkins){
+        let btn = document.getElementById("skinBtn-" + name);
+        if(!btn) continue;
+
+        btn.src = jetSkins[name];
+        btn.classList.toggle("aktiv", name === aktuellerSkin);
+        btn.classList.toggle("gesperrt", !gekaufteSkins[name]);
+
+        if(!gekaufteSkins[name]){
+            btn.title = (shopSkinNamen[name] || name) + " (im Shop kaufen)";
+        } else {
+            btn.title = shopSkinNamen[name] || name;
+        }
+    }
+}
+
+function setSkin(name){
+    if(!jetSkins[name]) return;
+    if(!gekaufteSkins[name]) return; // Skin muss erst im Shop gekauft werden
+    if(name === aktuellerSkin) return; // schon aktiv, nichts zu tun
+
+    aktuellerSkin = name;
+    jet.src = jetSkins[name];
+
+    aktualisiereSkinButtons();
+    speichereSpielstand();
+
+    // Shop nur aktualisieren, falls er gerade sichtbar ist
+    if(document.getElementById("todesScreen").style.display === "flex"){
+        shopAnzeigenAktualisieren();
+    }
+}
+
+function startSpiel(){
+    if(!spielLaeuft){
+        if(!spielerName){
+            spielerName = (window.prompt("Wie heißt du für die Top 10?") || "").trim().slice(0, 20);
+            if(!spielerName){
+                alert("Bitte gib einen Namen ein.");
+                return;
+            }
+            speichereSpielstand();
+        }
+        top10Gespeichert = false;
+        spielLaeuft=true;
+        aktualisiereSchwierigkeitsButtons();
+
+        spawnKiste();
+        if(kistenInterval) clearInterval(kistenInterval);
+        kistenInterval = setInterval(spawnKiste,3000);
+        kometenZaehler = 0;
+        bossLaeuft = false;
+        bossTreffer = 0;
+        bossKollisionsTreffer = 0;
+        bossCooldown = 0;
+        // Alle existierenden Boss-Elemente entfernen
+        document.querySelectorAll(".boss").forEach(b => b.remove());
+
+        if(kometInterval) clearInterval(kometInterval);
+        starteKometenIntervall();
+
+        // Power-Ups: erstes früher, danach regelmäßig
+        if(powerupInterval) clearInterval(powerupInterval);
+        setTimeout(spawnPowerup, 6000);
+        powerupInterval = setInterval(spawnPowerup, 12000);
+
+        // Timer für den Endboss
+        starteZeitTracker();
+    }
+}
+
+// ===== Zeit-Tracker für den Endboss (zeitstempel-basiert, dadurch nicht anfällig für ungenaue setInterval-Ticks) =====
+
+function starteZeitTracker(){
+    spielZeit = 0;
+    spielZeitLetzterTick = Date.now();
+    endbossSpawned = false;
+
+    if(spielZeitInterval) clearInterval(spielZeitInterval);
+    spielZeitInterval = setInterval(zeitTick, 200);
+
+    aktualisiereBossTimerAnzeige(schwierigkeitsEinstellungen[schwierigkeit].endbossZeit);
+}
+
+function zeitTick(){
+    let jetzt = Date.now();
+    let delta = (jetzt - spielZeitLetzterTick) / 1000;
+    spielZeitLetzterTick = jetzt;
+
+    aktualisierePowerupAnzeige();
+
+    let endbossZeit = schwierigkeitsEinstellungen[schwierigkeit].endbossZeit;
+
+    if(spielLaeuft && !spielGefroren && !endbossSpawned){
+        spielZeit += delta;
+
+        let rest = endbossZeit - spielZeit;
+        aktualisiereBossTimerAnzeige(rest);
+
+        if(spielZeit >= endbossZeit){
+            spawnEndboss();
+        }
+    }
+}
+
+function aktualisiereBossTimerAnzeige(restSekunden){
+    let anzeige = document.getElementById("AusBossTimer");
+    if(!anzeige) return;
+
+    if(restSekunden <= 0){
+        anzeige.innerHTML = "Endboss erscheint...";
+        return;
+    }
+
+    let minuten = Math.floor(restSekunden / 60);
+    let sekunden = Math.floor(restSekunden % 60);
+    anzeige.innerHTML = "Endboss in: " + minuten + ":" + (sekunden < 10 ? "0" : "") + sekunden;
+}
+
+function zeigeGameOver(){
+    if(rundenPunkte > rekordPunkte){
+        rekordPunkte = rundenPunkte;
+    }
+    punkteAnzeigeAktualisieren();
+    document.getElementById("AusGameOverPunkte").innerHTML =
+        "Rundenpunkte: " + rundenPunkte + "<br>Level: " + level + "<br>Rekord: " + rekordPunkte;
+    top10ErgebnisSpeichern();
+    speichereSpielstand();
+    document.getElementById("todesScreen").style.display = "flex";
+    shopAnzeigenAktualisieren();
+}
+
+function punkteAnzeigeAktualisieren(){
+    document.getElementById("AusPunkte").textContent = "Punkte: " + rundenPunkte;
+    document.getElementById("AusLevel").textContent =
+        "Level: " + level + " (" + (rundenPunkte % 10) + " / 10)";
+    document.getElementById("AusRekord").textContent = "Rekord: " + rekordPunkte;
+}
+
+function punktFuerKiste(){
+    rundenPunkte += 1;
+    if(rundenPunkte > rekordPunkte){
+        rekordPunkte = rundenPunkte;
+    }
+    let neuesLevel = Math.floor(rundenPunkte / 10) + 1;
+    if(neuesLevel > level){
+        level = neuesLevel;
+        if(spielLaeuft && !bossLaeuft){
+            starteKometenIntervall();
+        }
+    }
+    punkteAnzeigeAktualisieren();
+}
+
+async function top10Laden(){
+    let status = document.getElementById("top10Status");
+    let liste = document.getElementById("top10Liste");
+    status.textContent = "Lade Bestenliste ...";
+    liste.innerHTML = "";
+
+    try{
+        let antwort = await fetch("/.netlify/functions/top10");
+        if(!antwort.ok) throw new Error("Netzwerkfehler");
+        let eintraege = await antwort.json();
+        status.textContent = eintraege.length ? "Die besten Spieler weltweit:" : "Noch keine Ergebnisse.";
+        eintraege.forEach(function(eintrag, index){
+            let zeile = document.createElement("li");
+            zeile.textContent = eintrag.name + " — " + eintrag.punkte + " Punkte (Level " + eintrag.level + ")";
+            if(index < 3) zeile.style.color = ["#ffd54f", "#e0e0e0", "#ffb74d"][index];
+            liste.appendChild(zeile);
+        });
+    } catch(e){
+        status.textContent = "Die Online-Bestenliste ist gerade nicht erreichbar.";
+    }
+}
+
+async function top10ErgebnisSpeichern(){
+    if(top10Gespeichert || !spielerName) return;
+    top10Gespeichert = true;
+    try{
+        await fetch("/.netlify/functions/top10", {
+            method:"POST",
+            headers:{ "Content-Type":"application/json" },
+            body:JSON.stringify({
+                name:spielerName,
+                punkte:rundenPunkte,
+                level:level,
+                schwierigkeit:schwierigkeit
+            })
+        });
+    } catch(e){
+        // Die Runde bleibt spielbar, auch wenn Netlify kurz nicht erreichbar ist.
+    }
+}
+
+function top10Oeffnen(){
+    document.getElementById("top10Screen").style.display = "flex";
+    document.getElementById("top10Screen").setAttribute("aria-hidden", "false");
+    top10Laden();
+}
+
+function top10Schliessen(){
+    document.getElementById("top10Screen").style.display = "none";
+    document.getElementById("top10Screen").setAttribute("aria-hidden", "true");
+}
+
+function kometIntervallFuerLevel(){
+    let basis = schwierigkeitsEinstellungen[schwierigkeit].kometIntervall;
+    return Math.max(600, Math.round(basis * Math.pow(0.9, level - 1)));
+}
+
+function starteKometenIntervall(){
+    if(kometInterval) clearInterval(kometInterval);
+    kometInterval = setInterval(spawnKomet, kometIntervallFuerLevel());
+}
+
+function heilen(){
+    if(döner>0){
+        döner--;
+        gesundheit+=10;
+        document.getElementById("Aus1").innerHTML =
+        gesundheit+" gesundheit";
+        speichereSpielstand();
+    }
+}
+
+function makduen(){
+    if(Dino>0){
+        döner+=10;
+        Dino--;
+        speichereSpielstand();
+    }
+}
+
+// ===== Spielstand speichern & laden =====
+
+function speichereSpielstand(){
+    let stand = {
+        kristalle: kristalle,
+        gekaufteSkins: gekaufteSkins,
+        skin: aktuellerSkin,
+        rekordPunkte: rekordPunkte,
+        spielerName: spielerName
+    };
+
+    try{
+        localStorage.setItem("duesenjetSpielstand", JSON.stringify(stand));
+    } catch(e){
+        // localStorage evtl. nicht verfügbar, dann wird einfach nicht gespeichert
+    }
+}
+
+function ladeSpielstand(){
+    let stand;
+
+    try{
+        let daten = localStorage.getItem("duesenjetSpielstand");
+        if(!daten) return;
+        stand = JSON.parse(daten);
+    } catch(e){
+        return;
+    }
+
+    if(typeof stand.kristalle === "number") kristalle = stand.kristalle;
+    if(typeof stand.rekordPunkte === "number") rekordPunkte = stand.rekordPunkte;
+    if(typeof stand.spielerName === "string") spielerName = stand.spielerName.trim().slice(0, 20);
+
+    if(stand.gekaufteSkins && typeof stand.gekaufteSkins === "object"){
+        for(let name in gekaufteSkins){
+            if(stand.gekaufteSkins[name] === true){
+                gekaufteSkins[name] = true;
+            }
+        }
+    }
+
+    if(stand.skin && jetSkins[stand.skin] && gekaufteSkins[stand.skin]){
+        aktuellerSkin = stand.skin;
+    }
+}
+
+// ===== Shop (Skins kaufen & ausrüsten) =====
+
+let shopSkinNamen = {
+    standard: "Standard",
+    red: "Rot",
+    gelb: "Gelb"
+};
+
+function kaufeSkin(name){
+    if(gekaufteSkins[name]) return;
+    if(!skinPreise[name]) return;
+    if(münzen < skinPreise[name]) return;
+
+    münzen -= skinPreise[name];
+    gekaufteSkins[name] = true;
+
+    document.getElementById("AusM").innerHTML =
+        münzen + " <img src='muenze.png' class='emoji'>";
+
+    setSkin(name); // rüstet den neuen Skin direkt aus, speichert und aktualisiert den Shop
+}
+
+function shopAnzeigenAktualisieren(){
+    let münzenAnzeige = document.getElementById("shopMuenzenAnzeige");
+    if(münzenAnzeige){
+        münzenAnzeige.innerHTML = münzen + " <img src='muenze.png' class='emoji'>";
+    }
+
+    let container = document.getElementById("shopArtikel");
+    if(!container) return;
+
+    container.innerHTML = "";
+
+    for(let name in jetSkins){
+        let karte = document.createElement("div");
+        karte.className = "shopKarte";
+
+        let bild = document.createElement("img");
+        bild.src = jetSkins[name];
+
+        let titel = document.createElement("div");
+        titel.textContent = shopSkinNamen[name] || name;
+
+        karte.appendChild(bild);
+        karte.appendChild(titel);
+
+        if(!gekaufteSkins[name]){
+            let preis = document.createElement("div");
+            preis.textContent = skinPreise[name] + " Münzen";
+            karte.appendChild(preis);
+
+            let kaufBtn = document.createElement("button");
+            kaufBtn.className = "shopKaufBtn";
+            kaufBtn.textContent = "Kaufen";
+            kaufBtn.disabled = münzen < skinPreise[name];
+            kaufBtn.onclick = function(){ kaufeSkin(name); };
+            karte.appendChild(kaufBtn);
+        } else if(aktuellerSkin === name){
+            let ausgeruestetBtn = document.createElement("button");
+            ausgeruestetBtn.className = "shopAusgeruestetBtn";
+            ausgeruestetBtn.textContent = "Ausgerüstet";
+            ausgeruestetBtn.disabled = true;
+            karte.appendChild(ausgeruestetBtn);
+        } else {
+            let ausruestenBtn = document.createElement("button");
+            ausruestenBtn.className = "shopAusruestenBtn";
+            ausruestenBtn.textContent = "Ausrüsten";
+            ausruestenBtn.onclick = function(){ setSkin(name); };
+            karte.appendChild(ausruestenBtn);
+        }
+
+        container.appendChild(karte);
+    }
+}
+
+function anzeigeAktualisieren(){
+    document.getElementById("AusK").innerHTML =
+        kristalle + " <img src='kristall.png' class='emoji'>";
+
+    document.getElementById("AusM").innerHTML =
+        münzen + " <img src='muenze.png' class='emoji'>";
+
+    document.getElementById("Aus1").innerHTML =
+        gesundheit + " gesundheit";
+
+    document.getElementById("Aus2").innerHTML =
+        döner + " 🥙";
+
+    document.getElementById("Aus4").innerHTML =
+        Dino + " <img src='dinosaurier.png' class='emoji'>";
+
+    document.getElementById("AusLeben").innerHTML =
+        "❤️ Leben: " + leben;
+
+    punkteAnzeigeAktualisieren();
+}
+
+let jet=document.getElementById("jet");
+jet.style.left="150px";
+jet.style.top="120px";
+
+// Gespeicherten Spielstand laden (falls vorhanden) und Anzeige/Skin aktualisieren
+ladeSpielstand();
+anzeigeAktualisieren();
+jet.src = jetSkins[aktuellerSkin];
+aktualisiereSkinButtons();
+
+// Spielstand zusätzlich beim Verlassen/Schließen der Seite sichern
+window.addEventListener("beforeunload", speichereSpielstand);
+
+// ===== Responsive Skalierung des Spielfelds (funktioniert auf PC, Tablet und Handy) =====
+// Das Spielfeld bleibt intern immer 800x600, damit sich an der Spawn-/Bewegungslogik
+// nichts ändert - es wird nur optisch per CSS-Transform auf die verfügbare Größe skaliert.
+
+function spielfeldSkalieren(){
+    let feldBreite = 800;
+    let feldHoehe = 600;
+
+    let uiElement = document.getElementById("ui");
+    let verfuegbareBreite;
+    let verfuegbareHoehe;
+
+    if(window.innerWidth > 900){
+        // Desktop: ui und Spielfeld nebeneinander
+        verfuegbareBreite = window.innerWidth - uiElement.offsetWidth - 64;
+        verfuegbareHoehe = window.innerHeight - 48;
+        let skala = Math.min(verfuegbareBreite / feldBreite, verfuegbareHoehe / feldHoehe, 1);
+        if(!isFinite(skala) || skala <= 0) skala = 0.3;
+        skala = Math.max(skala, 0.28);
+        spielbereichSkalieren(skala, feldBreite, feldHoehe);
+        return;
+    }
+
+    // Handy/Tablet: Die Breite bestimmt die Größe. Dadurch wird das Spielfeld
+    // nicht durch die Anzeige oberhalb unnötig klein gerechnet.
+    verfuegbareBreite = window.innerWidth - 16;
+    verfuegbareHoehe = window.innerHeight - 130;
+
+    let skala = verfuegbareBreite / feldBreite;
+    if(window.innerWidth > window.innerHeight){
+        // Im Querformat muss noch Platz für die Touch-Steuerung bleiben.
+        skala = Math.min(skala, verfuegbareHoehe / feldHoehe);
+    }
+    if(!isFinite(skala) || skala <= 0) skala = 0.3;
+    skala = Math.max(skala, 0.4);
+    skala = Math.min(skala, 1);
+
+    spielbereichSkalieren(skala, feldBreite, feldHoehe);
+}
+
+function spielbereichSkalieren(skala, feldBreite, feldHoehe){
+    let jetBoxEl = document.getElementById("jetBox");
+    jetBoxEl.style.transform = "scale(" + skala + ")";
+
+    let wrapper = document.getElementById("feldWrapper");
+    wrapper.style.width = (feldBreite * skala) + "px";
+    wrapper.style.height = (feldHoehe * skala) + "px";
+}
+
+window.addEventListener("resize", spielfeldSkalieren);
+window.addEventListener("orientationchange", spielfeldSkalieren);
+spielfeldSkalieren();
+setTimeout(spielfeldSkalieren, 200); // Sicherheitsnetz, falls sich UI-Größe nach dem Laden noch ändert
+
+let speed=4;
+let keys={
+    w:false,
+    a:false,
+    s:false,
+    d:false
+};
+
+document.addEventListener("keydown",function(e){
+    const pfeilTasten = { ArrowUp:"w", ArrowLeft:"a", ArrowDown:"s", ArrowRight:"d" };
+    if(pfeilTasten[e.key]){
+        keys[pfeilTasten[e.key]] = true;
+        e.preventDefault();
+    }
+    if(keys[e.key]!==undefined){
+        keys[e.key]=true;
+        e.preventDefault();
+    }
+    if(e.code==="Space"){
+        e.preventDefault();
+        shoot();
+    }
+});
+
+document.addEventListener("keyup",function(e){
+    const pfeilTasten = { ArrowUp:"w", ArrowLeft:"a", ArrowDown:"s", ArrowRight:"d" };
+    if(pfeilTasten[e.key]){
+        keys[pfeilTasten[e.key]] = false;
+        e.preventDefault();
+    }
+    if(keys[e.key]!==undefined){
+        keys[e.key]=false;
+        e.preventDefault();
+    }
+});
+
+// ===== Touch-Steuerung (Handy/Tablet) =====
+
+function steuerBtnVerbinden(id, taste){
+    let btn = document.getElementById(id);
+    if(!btn) return;
+
+    btn.addEventListener("touchstart", function(e){
+        e.preventDefault();
+        keys[taste] = true;
+    }, { passive:false });
+
+    btn.addEventListener("touchend", function(e){
+        e.preventDefault();
+        keys[taste] = false;
+    }, { passive:false });
+
+    btn.addEventListener("touchcancel", function(e){
+        keys[taste] = false;
+    });
+
+    // Pointer-Events funktionieren einheitlich für Touch, Stift und Maus.
+    btn.addEventListener("pointerdown", function(e){
+        e.preventDefault();
+        keys[taste] = true;
+        btn.setPointerCapture?.(e.pointerId);
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function(typ){
+        btn.addEventListener(typ, function(){ keys[taste] = false; });
+    });
+
+    // zusätzlich Maus-Unterstützung zum Testen am PC
+    btn.addEventListener("mousedown", function(){ keys[taste] = true; });
+    btn.addEventListener("mouseup", function(){ keys[taste] = false; });
+    btn.addEventListener("mouseleave", function(){ keys[taste] = false; });
+}
+
+steuerBtnVerbinden("btnHoch", "w");
+steuerBtnVerbinden("btnRunter", "s");
+steuerBtnVerbinden("btnLinks", "a");
+steuerBtnVerbinden("btnRechts", "d");
+
+let schiessIntervall = null;
+
+function schiessenStarten(e){
+    if(e) e.preventDefault();
+    if(schiessIntervall) return;
+    shoot();
+    schiessIntervall = setInterval(shoot, 50); // schiessErlaubt() begrenzt die tatsächliche Feuerrate
+}
+
+function schiessenStoppen(){
+    if(schiessIntervall){
+        clearInterval(schiessIntervall);
+        schiessIntervall = null;
+    }
+}
+
+let btnSchiessenEl = document.getElementById("btnSchiessen");
+if(btnSchiessenEl){
+    btnSchiessenEl.addEventListener("touchstart", schiessenStarten, { passive:false });
+    btnSchiessenEl.addEventListener("touchend", function(e){ e.preventDefault(); schiessenStoppen(); }, { passive:false });
+    btnSchiessenEl.addEventListener("touchcancel", schiessenStoppen);
+    btnSchiessenEl.addEventListener("mousedown", schiessenStarten);
+    btnSchiessenEl.addEventListener("mouseup", schiessenStoppen);
+    btnSchiessenEl.addEventListener("mouseleave", schiessenStoppen);
+    btnSchiessenEl.addEventListener("pointerdown", schiessenStarten);
+    ["pointerup", "pointercancel", "pointerleave"].forEach(function(typ){
+        btnSchiessenEl.addEventListener(typ, schiessenStoppen);
+    });
+}
+
+function gameLoop(){
+    if(spielGefroren){
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
+    if(!spielLaeuft){
+        requestAnimationFrame(gameLoop);
+        return;
+    }
+
+    let x=jet.offsetLeft;
+    let y=jet.offsetTop;
+
+    if(keys.w)y-=speed;
+    if(keys.s)y+=speed;
+    if(keys.a)x-=speed;
+    if(keys.d)x+=speed;
+
+    let box=document.getElementById("jetBox");
+
+    if(x<0)x=0;
+    if(y<0)y=0;
+    if(x>box.clientWidth-60)
+        x=box.clientWidth-60;
+    if(y>box.clientHeight-60)
+        y=box.clientHeight-60;
+
+    jet.style.left=x+"px";
+    jet.style.top=y+"px";
+    jetFeuerSpawnen(x, y);
+
+    // Power-Ups einsammeln, wenn der Jet sie berührt
+    for(let i = powerups.length - 1; i >= 0; i--){
+        let p = powerups[i];
+        if(
+            x < p.offsetLeft + 30 &&
+            x + 60 > p.offsetLeft &&
+            y < p.offsetTop + 30 &&
+            y + 60 > p.offsetTop
+        ){
+            sammlePowerup(p);
+        }
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+
+let letztesJetFeuer = 0;
+
+function jetFeuerSpawnen(x, y){
+    let jetzt = Date.now();
+    // Kleine, unregelmäßige Feuerstöße hinter dem Jet.
+    if(!keys.d || jetzt - letztesJetFeuer < 220 || Math.random() > 0.22) return;
+    letztesJetFeuer = jetzt;
+
+    let feuer = document.createElement("div");
+    feuer.className = "jet-feuer";
+    // Der Auspuff des 50×50-Pixel-Jets liegt nach der Skalierung bei etwa x + 10.
+    // Die Flammenspitze endet deshalb genau an dieser Stelle.
+    feuer.style.left = (x - 18) + "px";
+    feuer.style.top = (y + 20) + "px";
+    feuer.style.transform = "scale(" + (0.75 + Math.random() * 0.55) + ")";
+    feuer.addEventListener("animationend", function(){ feuer.remove(); });
+    document.getElementById("jetBox").appendChild(feuer);
+}
+
+function spawnPowerup(){
+    if(!spielLaeuft || spielGefroren) return;
+
+    let typ = Math.random() < 0.5 ? "feuerrate" : "schaden";
+
+    let powerup = document.createElement("div");
+    powerup.className = "powerup powerup-" + typ;
+    powerup.textContent = typ === "feuerrate" ? "⚡" : "💥";
+    powerup.setAttribute("data-typ", typ);
+
+    let x = Math.random() * 760;
+    let y = Math.random() * 560;
+
+    let dx = Math.random() * 2 - 1;
+    let dy = Math.random() * 2 - 1;
+    if(Math.abs(dx) < 0.4) dx = dx < 0 ? -0.4 : 0.4;
+    if(Math.abs(dy) < 0.4) dy = dy < 0 ? -0.4 : 0.4;
+
+    powerup.style.left = x + "px";
+    powerup.style.top = y + "px";
+
+    document.getElementById("jetBox").appendChild(powerup);
+    powerups.push(powerup);
+
+    function bewegen(){
+        if(!spielLaeuft || spielGefroren) return;
+        if(powerups.indexOf(powerup) === -1) return; // wurde eingesammelt
+
+        x += dx;
+        y += dy;
+
+        if(x <= 0 || x >= 770) dx = -dx;
+        if(y <= 0 || y >= 570) dy = -dy;
+
+        powerup.style.left = x + "px";
+        powerup.style.top = y + "px";
+
+        requestAnimationFrame(bewegen);
+    }
+
+    bewegen();
+}
+
+function sammlePowerup(powerup){
+    let typ = powerup.getAttribute("data-typ");
+    let dauer = 10000; // 10 Sekunden
+
+    if(typ === "feuerrate"){
+        feuerRateBonusBisZeit = Date.now() + dauer;
+    } else {
+        schadenBonusBisZeit = Date.now() + dauer;
+    }
+
+    powerup.remove();
+    let index = powerups.indexOf(powerup);
+    if(index !== -1) powerups.splice(index, 1);
+}
+
+function aktualisierePowerupAnzeige(){
+    let anzeige = document.getElementById("AusBoni");
+    if(!anzeige) return;
+
+    let jetzt = Date.now();
+    let teile = [];
+
+    if(jetzt < feuerRateBonusBisZeit){
+        teile.push("⚡ Feuerrate +" + Math.ceil((feuerRateBonusBisZeit - jetzt) / 1000) + "s");
+    }
+    if(jetzt < schadenBonusBisZeit){
+        teile.push("💥 Schaden +" + Math.ceil((schadenBonusBisZeit - jetzt) / 1000) + "s");
+    }
+
+    anzeige.innerHTML = teile.join(" &nbsp; ");
+}
+
+function spawnKiste(){
+    if(!spielLaeuft)return;
+
+    let kiste=document.createElement("img");
+
+    // 10% Chance für Kristalkiste
+    let istKristalkiste = Math.random() < 0.1;
+
+    if(istKristalkiste){
+        kiste.src="kristall_kiste.png";
+        kiste.setAttribute("data-kristal", "true");
+    } else {
+        kiste.src="kiste.png";
+        kiste.setAttribute("data-kristal", "false");
+    }
+
+    kiste.className="kiste";
+
+    let x=Math.random()*760;
+    let y=Math.random()*560;
+
+    // Kristalkisten bewegen sich schneller
+    let speedFaktor = istKristalkiste ? 2 : 1;
+
+    // zufällige Geschwindigkeit
+    let dx=(Math.random()*4-2)*speedFaktor;
+    let dy=(Math.random()*4-2)*speedFaktor;
+
+    // nicht zu langsam machen
+    if(Math.abs(dx)<1*speedFaktor) dx = (dx<0 ? -1 : 1)*speedFaktor;
+    if(Math.abs(dy)<1*speedFaktor) dy = (dy<0 ? -1 : 1)*speedFaktor;
+
+    kiste.style.left=x+"px";
+    kiste.style.top=y+"px";
+
+    document.getElementById("jetBox")
+    .appendChild(kiste);
+
+    kisten.push(kiste);
+
+    // Bewegung der Kiste
+    function bewegen(){
+        if(!spielLaeuft || spielGefroren){
+            return;
+        }
+
+        x+=dx;
+        y+=dy;
+
+        // an Wänden abprallen
+        if(x<=0 || x>=760){
+            dx=-dx;
+        }
+
+        if(y<=0 || y>=560){
+            dy=-dy;
+        }
+
+        // manchmal Richtung ändern
+        if(Math.random()<0.01){
+            dx=(Math.random()*5-2.5)*speedFaktor;
+            dy=(Math.random()*5-2.5)*speedFaktor;
+        }
+
+        kiste.style.left=x+"px";
+        kiste.style.top=y+"px";
+
+        requestAnimationFrame(bewegen);
+    }
+
+    bewegen();
+}
+
+function schiessErlaubt(){
+    let jetzt = Date.now();
+    let effektiveFeuerRate = (jetzt < feuerRateBonusBisZeit) ? feuerRate * 0.5 : feuerRate;
+
+    if(jetzt - letzterSchuss < effektiveFeuerRate) return false;
+
+    letzterSchuss = jetzt;
+    return true;
+}
+
+function effektiverSchaden(){
+    return (Date.now() < schadenBonusBisZeit) ? schaden + 1 : schaden;
+}
+
+function shoot(){
+    if(!spielLaeuft || spielGefroren)
+        return;
+
+    if(!schiessErlaubt())
+        return;
+
+    let bullet=document.createElement("div");
+    bullet.className="bullet";
+
+    let x=jet.offsetLeft+60;
+    let y=jet.offsetTop+25;
+
+    bullet.style.left=x+"px";
+    bullet.style.top=y+"px";
+
+    document.getElementById("jetBox")
+    .appendChild(bullet);
+
+    function move(){
+        x+=10;
+        bullet.style.left=x+"px";
+
+        kisten.forEach(function(k,index){
+            if(
+                x<k.offsetLeft+40 &&
+                x+15>k.offsetLeft &&
+                y<k.offsetTop+40 &&
+                y+15>k.offsetTop
+            ){
+                k.remove();
+                kisten.splice(index,1);
+                bullet.remove();
+                punktFuerKiste();
+
+                // Prüfe ob es eine Kristalkiste war
+                if(k.getAttribute("data-kristal") === "true"){
+                    kristalle += 1;
+                    document.getElementById("AusK").innerHTML =
+                        kristalle + " <img src='kristall.png' class='emoji'>";
+                } else {
+                    münzen += 1;
+                    document.getElementById("AusM").innerHTML =
+                        münzen + " <img src='muenze.png' class='emoji'>";
+                }
+
+                speichereSpielstand();
+            }
+        });
+
+        // Schuss auf Boss
+        let boss = document.querySelector(".boss");
+        if(boss && bossLaeuft){
+            if(
+                x < boss.offsetLeft + 70 &&
+                x + 15 > boss.offsetLeft &&
+                y < boss.offsetTop + 70 &&
+                y + 15 > boss.offsetTop
+            ){
+                bossLeben -= effektiverSchaden();
+                bullet.remove();
+
+                // Wenn das Boss-Leben aufgebraucht ist
+                if(bossLeben <= 0){
+    bossLaeuft = false;   // Boss deaktivieren
+    boss.remove();        // Boss entfernen
+    bossTreffer = 0;      // optional reset
+    leben += 1;
+
+    document.getElementById("AusLeben").innerHTML =
+        "❤️ Leben: " + leben;
+
+    speichereSpielstand();
+
+    kometenZaehler = 0;
+    starteKometenIntervall();
+    return;
+}
+
+            }
+        }
+
+        // Schuss auf Endboss-Ziele
+        if(endbossAktiv){
+            let zielIds = ["ziel1","ziel2"];
+            for(let i=0;i<zielIds.length;i++){
+                let ziel = document.getElementById(zielIds[i]);
+                if(ziel){
+                    if(
+                        x < ziel.offsetLeft + 26 &&
+                        x + 15 > ziel.offsetLeft &&
+                        y < ziel.offsetTop + 26 &&
+                        y + 15 > ziel.offsetTop
+                    ){
+                        bullet.remove();
+                        zielLeben[zielIds[i]] -= effektiverSchaden();
+
+                        if(zielLeben[zielIds[i]] <= 0){
+                            zielGetroffen(zielIds[i]);
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        if(x>800){
+            bullet.remove();
+            return;
+        }
+
+        requestAnimationFrame(move);
+    }
+
+    move();
+}
+
+function spawnKomet(){
+    if(!spielLaeuft || spielGefroren)
+        return;
+
+    kometenZaehler++;
+
+    if(kometenZaehler >= schwierigkeitsEinstellungen[schwierigkeit].bossSchwelle && !bossLaeuft){
+        bossLaeuft = true;
+
+        if(kometInterval) clearInterval(kometInterval);
+
+        spawnBoss();
+        return;
+    }
+
+    let komet=document.createElement("div");
+    komet.className="komet";
+
+    // Manche Kometen kleiner, andere größer
+    let size = Math.random() * 0.6 + 0.7;
+    komet.style.transform = `scale(${size})`;
+    komet.style.boxShadow = `0 0 ${15 * size}px red`;
+
+    let rand=Math.floor(Math.random()*4);
+    let x,y,dx,dy;
+    let speedFaktorSchwierigkeit = schwierigkeitsEinstellungen[schwierigkeit].kometSpeedFaktor;
+    let speedFaktorLevel = 1 + (level - 1) * 0.1;
+
+    if(rand===0){
+        x=Math.random()*800;
+        y=-40;
+        dx=Math.random()*4-2;
+        dy=3;
+    }
+
+    if(rand===1){
+        x=Math.random()*800;
+        y=600;
+        dx=Math.random()*4-2;
+        dy=-3;
+    }
+
+    if(rand===2){
+        x=-40;
+        y=Math.random()*600;
+        dx=3;
+        dy=Math.random()*4-2;
+    }
+
+    if(rand===3){
+        x=800;
+        y=Math.random()*600;
+        dx=-3;
+        dy=Math.random()*4-2;
+    }
+
+    dx *= speedFaktorSchwierigkeit * speedFaktorLevel;
+    dy *= speedFaktorSchwierigkeit * speedFaktorLevel;
+
+    komet.style.left=x+"px";
+    komet.style.top=y+"px";
+
+    document.getElementById("jetBox").appendChild(komet);
+
+    function fliegen(){
+        if(spielGefroren) return;
+
+        x+=dx;
+        y+=dy;
+
+        komet.style.left=x+"px";
+        komet.style.top=y+"px";
+
+        let kompX = 35 * size;
+        let kompY = 35 * size;
+
+        if(
+            x<jet.offsetLeft+60 &&
+            x+kompX>jet.offsetLeft &&
+            y<jet.offsetTop+60 &&
+            y+kompY>jet.offsetTop
+        ){
+            spielGefroren=true;
+            zeigeGameOver();
+            komet.remove();
+            return;
+        }
+
+        if(x<-100 || x>900 || y<-100 || y>700){
+            komet.remove();
+            return;
+        }
+
+        requestAnimationFrame(fliegen);
+    }
+
+    fliegen();
+}
+
+function neustart(){
+    if(kometInterval) clearInterval(kometInterval);
+    if(kistenInterval) clearInterval(kistenInterval);
+    if(powerupInterval) clearInterval(powerupInterval);
+
+    // Power-Ups entfernen und Boni beenden
+    document.querySelectorAll(".powerup").forEach(p => p.remove());
+    powerups = [];
+    feuerRateBonusBisZeit = 0;
+    schadenBonusBisZeit = 0;
+    aktualisierePowerupAnzeige();
+
+    kometenZaehler = 0;
+    bossLaeuft = false;
+    bossTreffer = 0;
+    bossKollisionsTreffer = 0;
+    bossCooldown = 0;
+    bossLeben = 0;
+
+    // Alle existierenden Boss-Elemente entfernen
+    document.querySelectorAll(".boss").forEach(b => b.remove());
+
+    // Endboss zurücksetzen
+    if(spielZeitInterval) clearInterval(spielZeitInterval);
+    if(endbossKometInterval) clearInterval(endbossKometInterval);
+    spielZeit = 0;
+    endbossSpawned = false;
+    endbossAktiv = false;
+    ziel1Zerstoert = false;
+    ziel2Zerstoert = false;
+    if(endboss){ endboss.remove(); endboss = null; }
+    document.querySelectorAll(".ziel").forEach(z => z.remove());
+
+    aktualisiereBossTimerAnzeige(schwierigkeitsEinstellungen[schwierigkeit].endbossZeit);
+
+    gesundheit=100;
+    döner=10;
+    Dino=0;
+    münzen = 0;
+    leben = 1;
+    rundenPunkte = 0;
+    level = 1;
+    punkteAnzeigeAktualisieren();
+
+    document.getElementById("AusM").innerHTML =
+    münzen + " <img src='muenze.png' class='emoji'>";
+
+    document.getElementById("Aus1").innerHTML =
+    gesundheit+" gesundheit";
+
+    document.getElementById("Aus2").innerHTML =
+    döner+" 🥙";
+
+    document.getElementById("AusLeben").innerHTML =
+    "❤️ Leben: " + leben;
+
+    document.getElementById("todesScreen").style.display="none";
+
+    spielGefroren=false;
+    spielLaeuft=false;
+    aktualisiereSchwierigkeitsButtons();
+
+    kisten.forEach(k=>{
+        k.remove();
+    });
+
+    kisten=[];
+
+    document.querySelectorAll(".komet").forEach(k=>{
+        k.remove();
+    });
+
+    jet.style.left="150px";
+    jet.style.top="120px";
+
+    // Skin bleibt beim Neustart erhalten
+    jet.src = jetSkins[aktuellerSkin];
+
+    speichereSpielstand();
+}
+
+function spawnHintergrundschiff(){
+    let schiff = document.createElement("div");
+    schiff.className = "hintergrundschiff";
+
+    let vonLinks = Math.random() < 0.5;
+    let y = Math.random() * 560;
+    let x = vonLinks ? -60 : 860;
+
+    let dx = vonLinks ? (1 + Math.random() * 1.5) : -(1 + Math.random() * 1.5);
+    let dyDrift = Math.random() * 0.6 - 0.3;
+    let groesse = 0.6 + Math.random() * 0.8;
+
+    schiff.style.top = y + "px";
+    schiff.style.left = x + "px";
+    schiff.style.opacity = (0.3 + Math.random() * 0.35).toFixed(2);
+    schiff.style.transform = "scale(" + groesse + ")" + (vonLinks ? "" : " scaleX(-1)");
+
+    document.getElementById("jetBox").appendChild(schiff);
+
+    function fliegen(){
+        x += dx;
+        y += dyDrift;
+
+        schiff.style.left = x + "px";
+        schiff.style.top = y + "px";
+
+        if(x < -100 || x > 900){
+            schiff.remove();
+            return;
+        }
+
+        requestAnimationFrame(fliegen);
+    }
+
+    fliegen();
+}
+
+// Farbverläufe für verschiedene Planeten-Typen
+let planetFarben = [
+    "radial-gradient(circle at 35% 30%, #ff9a76, #b34a2c 70%, #5c2413 100%)",
+    "radial-gradient(circle at 35% 30%, #7ec8ff, #2c5fb3 70%, #12294f 100%)",
+    "radial-gradient(circle at 35% 30%, #c9a6ff, #6b3fa0 70%, #2e1a4d 100%)",
+    "radial-gradient(circle at 35% 30%, #b9e6a8, #4c8f3c 70%, #234a1c 100%)",
+    "radial-gradient(circle at 35% 30%, #f5e6b8, #cbb26a 70%, #6b5a2c 100%)"
+];
+
+function spawnHintergrundPlanet(){
+    let planet = document.createElement("img");
+    planet.className = "planet";
+    planet.src = "Erde.png";
+
+    let groesse = 170;
+    let x = 610;
+    let y = -50;
+
+    planet.style.width = groesse + "px";
+    planet.style.height = groesse + "px";
+    planet.style.left = x + "px";
+    planet.style.top = y + "px";
+    planet.style.borderRadius = "0";
+    planet.style.imageRendering = "pixelated";
+
+    document.getElementById("jetBox").appendChild(planet);
+}
+
+// Gespeicherte Planetenreste entfernen; anschließend wird genau eine Erde oben rechts eingefügt.
+document.querySelectorAll("#jetBox .planet, #jetBox .planet-ring").forEach(function(planet){
+    planet.remove();
+});
+
+// Eine Erde oben rechts im Hintergrund
+spawnHintergrundPlanet();
+
+// Beim gespeicherten Stand vorhandene, unbewegliche Hintergrundschiffe entfernen.
+// Neu erzeugte Schiffe werden weiterhin durch spawnHintergrundschiff() animiert.
+document.querySelectorAll("#jetBox .hintergrundschiff").forEach(function(schiff){
+    schiff.remove();
+});
+
+// Regelmäßig neue Raumschiffe im Hintergrund starten
+setInterval(spawnHintergrundschiff, 3500);
+
+// Ein paar Schiffe direkt zu Beginn, damit der Hintergrund sofort lebendig wirkt
+spawnHintergrundschiff();
+setTimeout(spawnHintergrundschiff, 1200);
+setTimeout(spawnHintergrundschiff, 2600);
+
+function spawnBoss(){
+    if(spielGefroren) return;
+
+    // Vor dem Erstellen prüfen, ob bereits ein Boss existiert
+    if(document.querySelector(".boss")) return;
+
+    let boss = document.createElement("div");
+    boss.className = "boss";
+
+    let x = Math.random() * (800 - 70);
+    let y = -80;
+
+    boss.style.left = x + "px";
+    boss.style.top = y + "px";
+
+    bossLeben = schwierigkeitsEinstellungen[schwierigkeit].bossTrefferNoetig;
+
+    document.getElementById("jetBox").appendChild(boss);
+
+    function bossLoop(){
+        if(!bossLaeuft){
+            return;
+        }
+
+        if(!spielLaeuft || spielGefroren){
+            boss.remove();
+            bossLaeuft = false; // BossLaeuft zurücksetzen
+            return;
+        }
+
+        let targetX = jet.offsetLeft + 30;
+        let targetY = jet.offsetTop + 30;
+
+        let dx = (targetX - (x + 35)) * 0.01;
+        let dy = (targetY - (y + 35)) * 0.01;
+
+        x += dx;
+        y += dy;
+
+        if(x < 0) x = 0;
+        if(y < 0) y = 0;
+        if(x > 800 - 70) x = 800 - 70;
+        if(y > 600 - 70) y = 600 - 70;
+
+        boss.style.left = x + "px";
+        boss.style.top = y + "px";
+
+        if(bossCooldown > 0) bossCooldown -= 1;
+
+        if(
+            x < jet.offsetLeft + 60 &&
+            x + 70 > jet.offsetLeft &&
+            y < jet.offsetTop + 60 &&
+            y + 70 > jet.offsetTop
+        ){
+            if(bossCooldown === 0){
+                bossCooldown = 20;
+                bossKollisionsTreffer++;
+
+                if(bossKollisionsTreffer >= schwierigkeitsEinstellungen[schwierigkeit].bossKollisionsLimit){
+                    spielGefroren = true;
+                    zeigeGameOver();
+                    boss.remove();
+                    bossLaeuft = false; // BossLaeuft hier zurücksetzen
+                    return;
+                }
+            }
+        }
+
+        requestAnimationFrame(bossLoop);
+    }
+
+    bossLoop();
+}
+
+// ===== Zweiter Boss (Endboss) =====
+
+function spawnEndboss(){
+    if(endbossSpawned) return;
+    endbossSpawned = true;
+    endbossAktiv = true;
+    ziel1Zerstoert = false;
+    ziel2Zerstoert = false;
+
+    let timerAnzeige = document.getElementById("AusBossTimer");
+    if(timerAnzeige) timerAnzeige.innerHTML = "Endboss aktiv!";
+
+    endboss = document.createElement("img");
+    endboss.id = "endboss";
+    endboss.className = "endboss";
+    endboss.src = jetSkins[aktuellerSkin];
+    endboss.style.left = "650px";
+    endboss.style.top = "80px";
+
+    document.getElementById("jetBox").appendChild(endboss);
+
+    zielSpawnen("ziel1");
+    zielSpawnen("ziel2");
+
+    endbossKometInterval = setInterval(spawnEndbossKomet, schwierigkeitsEinstellungen[schwierigkeit].endbossKometIntervall);
+
+    endbossBewegung();
+}
+
+function endbossBewegung(){
+    if(!endbossAktiv || !endboss) return;
+
+    if(!spielLaeuft || spielGefroren){
+        return;
+    }
+
+    let t = Date.now() / 1000;
+    let x = 650 + Math.sin(t * 0.5) * 90;
+    let y = 80 + Math.cos(t * 0.7) * 50;
+
+    endboss.style.left = x + "px";
+    endboss.style.top = y + "px";
+
+    requestAnimationFrame(endbossBewegung);
+}
+
+function spawnEndbossKomet(){
+    if(!endbossAktiv || !spielLaeuft || spielGefroren || !endboss) return;
+
+    let komet = document.createElement("div");
+    komet.className = "komet";
+    komet.style.background = "purple";
+    komet.style.boxShadow = "0 0 15px purple";
+
+    let x = endboss.offsetLeft + 30;
+    let y = endboss.offsetTop + 30;
+
+    let zielX = jet.offsetLeft + 30;
+    let zielY = jet.offsetTop + 30;
+
+    let winkel = Math.atan2(zielY - y, zielX - x);
+    let geschwindigkeit = schwierigkeitsEinstellungen[schwierigkeit].endbossKometSpeed;
+    let dx = Math.cos(winkel) * geschwindigkeit;
+    let dy = Math.sin(winkel) * geschwindigkeit;
+
+    komet.style.left = x + "px";
+    komet.style.top = y + "px";
+
+    document.getElementById("jetBox").appendChild(komet);
+
+    function fliegen(){
+        if(spielGefroren) return;
+
+        x += dx;
+        y += dy;
+
+        komet.style.left = x + "px";
+        komet.style.top = y + "px";
+
+        if(
+            x < jet.offsetLeft + 60 &&
+            x + 35 > jet.offsetLeft &&
+            y < jet.offsetTop + 60 &&
+            y + 35 > jet.offsetTop
+        ){
+            spielGefroren = true;
+            zeigeGameOver();
+            komet.remove();
+            return;
+        }
+
+        if(x < -100 || x > 900 || y < -100 || y > 700){
+            komet.remove();
+            return;
+        }
+
+        requestAnimationFrame(fliegen);
+    }
+
+    fliegen();
+}
+
+function zielSpawnen(zielId){
+    if(document.getElementById(zielId)) return;
+
+    zielLeben[zielId] = zielLebenMax[zielId];
+
+    let ziel = document.createElement("div");
+    ziel.id = zielId;
+    ziel.className = "ziel";
+
+    if(zielId === "ziel1"){
+        // oben rechts
+        ziel.style.left = "734px";
+        ziel.style.top = "20px";
+    } else {
+        // unten rechts
+        ziel.style.left = "734px";
+        ziel.style.top = "554px";
+    }
+
+    document.getElementById("jetBox").appendChild(ziel);
+}
+
+function zielGetroffen(zielId){
+    let ziel = document.getElementById(zielId);
+    if(!ziel) return;
+    ziel.remove();
+
+    // 90% Chance, dass das Ziel wiederkommt
+    if(Math.random() < 0.9){
+        let wartezeit = 1500 + Math.random() * 1500;
+        setTimeout(function(){
+            if(endbossAktiv) zielSpawnen(zielId);
+        }, wartezeit);
+    } else {
+        if(zielId === "ziel1") ziel1Zerstoert = true;
+        else ziel2Zerstoert = true;
+        pruefeEndbossBesiegt();
+    }
+}
+
+function pruefeEndbossBesiegt(){
+    if(ziel1Zerstoert && ziel2Zerstoert){
+        endbossBesiegen();
+    }
+}
+
+function endbossBesiegen(){
+    endbossAktiv = false;
+
+    if(endbossKometInterval) clearInterval(endbossKometInterval);
+
+    if(endboss){
+        endboss.remove();
+        endboss = null;
+    }
+
+    document.querySelectorAll(".ziel").forEach(z => z.remove());
+
+    leben += 1;
+    document.getElementById("AusLeben").innerHTML =
+        "❤️ Leben: " + leben;
+
+    let timerAnzeige = document.getElementById("AusBossTimer");
+    if(timerAnzeige) timerAnzeige.innerHTML = "Endboss besiegt!";
+
+    speichereSpielstand();
+}
+
+</script>
+
+
+
+</body></html>
